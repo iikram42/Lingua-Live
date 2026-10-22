@@ -29,6 +29,7 @@ Without Google Cloud credentials, room creation, signaling, and WebRTC calls rem
 1. Create or select a Google Cloud project and enable Speech-to-Text, Cloud Translation, and Text-to-Speech APIs.
 2. Set GOOGLE_CLOUD_PROJECT in .env.
 3. Configure Application Default Credentials for the server process. For a local developer account, use gcloud auth application-default login. A service account can be supplied through GOOGLE_APPLICATION_CREDENTIALS; keep its file outside this repository.
+For Vercel, set `GOOGLE_CLOUD_PROJECT` and `GOOGLE_SERVICE_ACCOUNT_JSON` in Project Settings → Environment Variables. Set the JSON variable to the full service-account JSON and mark it as a Secret. Do not commit the JSON key. The local `GOOGLE_APPLICATION_CREDENTIALS` file-path method remains supported for development.
 4. Grant the server identity the permissions required to use the three APIs.
 5. Restart the server and check /api/health for the provider configuration flag.
 
@@ -48,7 +49,8 @@ WebRTC encrypts media transport but may reveal network information between peers
 | DATABASE_PATH | SQLite database path; defaults to .data/rooms.sqlite |
 | PRODUCT_NAME | Server-side product name |
 | VITE_PRODUCT_NAME | Product name displayed in the browser |
-| GOOGLE_CLOUD_PROJECT | Enables provider calls when ADC is configured |
+| GOOGLE_CLOUD_PROJECT | Google Cloud project used by the speech and translation providers |
+| GOOGLE_SERVICE_ACCOUNT_JSON | Optional full service-account JSON for Vercel deployments; store as a Secret |
 | GOOGLE_APPLICATION_CREDENTIALS | Optional ADC service account file path |
 | TURN_URL, TURN_USERNAME, TURN_CREDENTIAL | Optional relay settings |
 | APP_ORIGIN | Optional public HTTPS origin for same-origin checks; the request host is also checked |

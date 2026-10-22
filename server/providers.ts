@@ -8,9 +8,13 @@ import { LANGUAGES, type LanguageCode } from './rooms.js';
 export interface TranscriptUpdate { id: string; text: string; isFinal: boolean }
 export interface RecognitionSession { write: (audio: Buffer) => void; close: () => void }
 
-const speechClient = new speech.v1.SpeechClient();
-const translateClient = new translateV2.Translate({ projectId: config.googleProjectId });
-const ttsClient = new textToSpeech.TextToSpeechClient();
+const googleClientOptions = {
+  projectId: config.googleProjectId,
+  credentials: config.googleCredentials
+};
+const speechClient = new speech.v1.SpeechClient(googleClientOptions);
+const translateClient = new translateV2.Translate(googleClientOptions);
+const ttsClient = new textToSpeech.TextToSpeechClient(googleClientOptions);
 export const googleProvidersConfigured = config.googleConfigured;
 
 export function createRecognitionSession(
