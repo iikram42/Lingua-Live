@@ -6,9 +6,14 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers);
   if (init.body && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json');
   const response = await fetch(path, { ...init, headers, credentials: 'same-origin' });
-  const payload = await response.json() as T & ErrorResponse;
-  if (!response.ok) throw new Error(payload.error?.message || 'The request could not be completed.');
-  return payload;
+  let payload: (T & ErrorResponse) | undefined;
+  try {
+    payload = await response.json() as T & ErrorResponse;
+  } catch {
+    throw new Error(`The room server returned an unexpected response (HTTP ${response.status}). Check that the application server is deployed.`);
+  }
+  if (!response.ok) throw new Error(payload?.error?.message || 'The request could not be completed.');
+  return payload as T;
 }
 
 const base = (roomId: string): string => '/api/rooms/' + encodeURIComponent(roomId);

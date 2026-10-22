@@ -1,1 +1,4 @@
-{"$schema":"https://openapi.vercel.sh/vercel.json","outputDirectory":"dist/client","rewrites":[{"source":"/create","destination":"/index.html"},{"source":"/room/:roomId","destination":"/index.html"}]}
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "fluid": true
+}

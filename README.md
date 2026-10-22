@@ -51,7 +51,7 @@ WebRTC encrypts media transport but may reveal network information between peers
 | GOOGLE_CLOUD_PROJECT | Enables provider calls when ADC is configured |
 | GOOGLE_APPLICATION_CREDENTIALS | Optional ADC service account file path |
 | TURN_URL, TURN_USERNAME, TURN_CREDENTIAL | Optional relay settings |
-| APP_ORIGIN | Public HTTPS origin; required in production |
+| APP_ORIGIN | Optional public HTTPS origin for same-origin checks; the request host is also checked |
 
 ## Database
 
@@ -70,6 +70,12 @@ The server applies numbered SQL migrations transactionally at startup. Migration
 ## CI
 
 The GitHub Actions workflow installs with npm ci, then runs lint, type checking, unit tests, and the production build on Node.js 22.
+
+## Vercel
+
+Vercel detects `Dockerfile.vercel` and deploys the complete Express application, static client, room API, and WebSocket endpoint as a container function. The deployment listens on port 80. Vercel Fluid Compute must be enabled for WebSocket support.
+
+The Vercel container uses `/tmp/rooms.sqlite`; that file and the in-memory WebSocket and rate-limit state are local to one container instance. This is suitable for a single-instance preview, but Vercel can create or restart instances. A multi-instance production deployment needs shared durable room storage and cross-instance WebSocket event relay.
 
 ## Security and privacy
 

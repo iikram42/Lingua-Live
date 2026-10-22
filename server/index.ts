@@ -76,8 +76,8 @@ function requireSameOrigin(req: Request, res: Response): boolean {
   const origin = req.headers.origin;
   try {
     const parsed = origin ? new URL(origin) : null;
-    const expectedHost = config.appOrigin ? new URL(config.appOrigin).host : req.headers.host;
-    if (!parsed || parsed.host !== expectedHost ||
+    const expectedHosts = new Set([req.headers.host, config.appOrigin ? new URL(config.appOrigin).host : undefined]);
+    if (!parsed || !expectedHosts.has(parsed.host) ||
         (config.nodeEnv === 'production' && parsed.protocol !== 'https:')) throw new Error();
     return true;
   } catch {
@@ -181,8 +181,8 @@ function allowedOrigin(origin: string | undefined, host: string | undefined): bo
   if (!origin || !host) return false;
   try {
     const parsed = new URL(origin);
-    const expectedHost = config.appOrigin ? new URL(config.appOrigin).host : host;
-    return parsed.host === expectedHost && (config.nodeEnv !== 'production' || parsed.protocol === 'https:');
+    const expectedHosts = new Set([host, config.appOrigin ? new URL(config.appOrigin).host : undefined]);
+    return expectedHosts.has(parsed.host) && (config.nodeEnv !== 'production' || parsed.protocol === 'https:');
   } catch { return false; }
 }
 interface ClientMessage {

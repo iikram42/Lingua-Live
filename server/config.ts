@@ -3,7 +3,7 @@ import { z } from 'zod';
 
 const schema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
-  PORT: z.coerce.number().int().min(1).max(65535).default(3001),
+  PORT: z.coerce.number().int().min(1).max(65535).default(process.env.VERCEL === '1' ? 80 : 3001),
   DATABASE_PATH: z.string().min(1).default('.data/rooms.sqlite'),
   PRODUCT_NAME: z.string().trim().min(1).max(48).default('Lingua Live'),
   APP_ORIGIN: z.string().url().optional().or(z.literal('')),
@@ -17,7 +17,6 @@ if (!result.success) {
   throw new Error('Invalid server configuration: ' + result.error.issues.map((issue) => issue.path.join('.') + ' ' + issue.message).join('; '));
 }
 const env = result.data;
-if (env.NODE_ENV === 'production' && !env.APP_ORIGIN) throw new Error('APP_ORIGIN is required in production.');
 if ((env.TURN_URL || env.TURN_USERNAME || env.TURN_CREDENTIAL) && !(env.TURN_URL && env.TURN_USERNAME && env.TURN_CREDENTIAL)) {
   throw new Error('TURN_URL, TURN_USERNAME, and TURN_CREDENTIAL must be set together.');
 }
