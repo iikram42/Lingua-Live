@@ -1,0 +1,35 @@
+import 'dotenv/config';
+import { z } from 'zod';
+
+const schema = z.object({
+  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+  PORT: z.coerce.number().int().min(1).max(65535).default(3001),
+  DATABASE_PATH: z.string().min(1).default('.data/rooms.sqlite'),
+  PRODUCT_NAME: z.string().trim().min(1).max(48).default('Lingua Live'),
+  APP_ORIGIN: z.string().url().optional().or(z.literal('')),
+  GOOGLE_CLOUD_PROJECT: z.string().trim().min(1).optional().or(z.literal('')),
+  TURN_URL: z.string().trim().optional().or(z.literal('')),
+  TURN_USERNAME: z.string().trim().optional().or(z.literal('')),
+  TURN_CREDENTIAL: z.string().trim().optional().or(z.literal(''))
+});
+const result = schema.safeParse(process.env);
+if (!result.success) {
+  throw new Error('Invalid server configuration: ' + result.error.issues.map((issue) => issue.path.join('.') + ' ' + issue.message).join('; '));
+}
+const env = result.data;
+if (env.NODE_ENV === 'production' && !env.APP_ORIGIN) throw new Error('APP_ORIGIN is required in production.');
+if ((env.TURN_URL || env.TURN_USERNAME || env.TURN_CREDENTIAL) && !(env.TURN_URL && env.TURN_USERNAME && env.TURN_CREDENTIAL)) {
+  throw new Error('TURN_URL, TURN_USERNAME, and TURN_CREDENTIAL must be set together.');
+}
+export const config = {
+  nodeEnv: env.NODE_ENV,
+  port: env.PORT,
+  databasePath: env.DATABASE_PATH,
+  productName: env.PRODUCT_NAME,
+  appOrigin: env.APP_ORIGIN || undefined,
+  googleProjectId: env.GOOGLE_CLOUD_PROJECT || undefined,
+  googleConfigured: Boolean(env.GOOGLE_CLOUD_PROJECT),
+  turn: env.TURN_URL && env.TURN_USERNAME && env.TURN_CREDENTIAL
+    ? { urls: env.TURN_URL, username: env.TURN_USERNAME, credential: env.TURN_CREDENTIAL }
+    : undefined
+};

@@ -1,0 +1,15 @@
+services:
+  lingua-live:
+    build: .
+    env_file: .env
+    environment:
+      PORT: 3001
+      DATABASE_PATH: /app/.data/rooms.sqlite
+      NODE_ENV: production
+    ports:
+      - "3001:3001"
+    volumes:
+      - lingua-data:/app/.data
+    restart: unless-stopped
+volumes:
+  lingua-data:
